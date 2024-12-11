@@ -50,7 +50,7 @@ gltfLoader.load('./static/xmastree.glb',(gltf)=>{
     });
 
 const ground  = gltf.scene.children.find(children=>children.name === 'ground')
-const tree  = gltf.scene.children.find(children=>children.name === 'Cylinder006')
+const tree  = gltf.scene.children.find(children=>children.name === 'Cylinder001')
 const snow  = gltf.scene.children.find(children=>children.name === 'ice-floor')
 
 if(ground ){
