@@ -3,6 +3,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import GUI from 'lil-gui'
 
+
+
+
+
 const gui = new GUI()
 
 const canvas = document.querySelector('canvas.webgl')
@@ -14,13 +18,10 @@ const textureLoader = new THREE.TextureLoader()
 //scene
 const scene = new THREE.Scene()
 
-//testobject
 
-// const testbox = new THREE.Mesh(
-//     new THREE.SphereGeometry(0.5,16,16),
-//     new THREE.MeshBasicMaterial({color: '#ff0000'})
-// )
-// scene.add(testbox)
+
+
+
 
 //x mas tree
 const ambietnlight = new THREE.AmbientLight(0xffffff, 1.5)
@@ -196,37 +197,45 @@ parameteers.spread = 7
 
 
 
-const generatesnow =(xOffset = 0, yOffset = 0, zOffset = 0)=>{
-    const snowgeometry = new THREE.BufferGeometry()
+const snowflakes = [];
 
-    const position = new Float32Array(parameteers.count*3)
 
-    for(let i =0;i< parameteers.count;i++){
-        const i3 = i*3
-        position[i3] = (Math.random() - 0.5) * parameteers.spread + xOffset; // X position with offset
-        position[i3 + 1] = (Math.random() - 0.5) * parameteers.spread + yOffset; // Y position with offset
-        position[i3 + 2] = (Math.random() - 0.5) * parameteers.spread + zOffset;
+// Snow Generation with Physics Bodies
+const generatesnow = (xOffset = 0, yOffset = 0, zOffset = 0) => {
+    const snowgeometry = new THREE.BufferGeometry();
+    const position = new Float32Array(parameteers.count * 3);
 
-        
+    for (let i = 0; i < parameteers.count; i++) {
+        const i3 = i * 3;
+        position[i3] = (Math.random() - 0.5) * parameteers.spread + xOffset; // X position
+        position[i3 + 1] = Math.random() * 5 + yOffset; // Spawn above ground
+        position[i3 + 2] = (Math.random() - 0.5) * parameteers.spread + zOffset; // Z position
+
+       
+
+     
     }
-    snowgeometry.setAttribute('position',new THREE.BufferAttribute(position,3))
 
+    snowgeometry.setAttribute('position', new THREE.BufferAttribute(position, 3));
+
+    // Material
     const snowmaterial = new THREE.PointsMaterial({
-        size:parameteers.size,
+        size: parameteers.size,
         sizeAttenuation: true,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
         alphaMap: snowflaketexture,
-        transparent: true
-    })
+        transparent: true,
+    });
 
-    const snowpoint = new THREE.Points(snowgeometry,snowmaterial)
-    scene.add(snowpoint)
-   
+    // Snowflakes (Points)
+    const snowpoints = new THREE.Points(snowgeometry, snowmaterial);
+    scene.add(snowpoints);
+    snowflakes.push(snowpoints);
+};
 
+generatesnow(-0.32, 2, -4.5);
 
-}
-generatesnow(-0.32,1,-4.5)
 
 const snowControl = gui.addFolder('SnowControl')
 
@@ -275,34 +284,42 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 
 
+const snowUpdate = (geometry) => {
+    const positions = geometry.attributes.position.array;
+
+    for (let i = 0; i < positions.length; i += 3) {
+        positions[i + 1] -= 0.001; // Move the Y-coordinate downwards (fall speed)
+
+        // If the snowflake reaches below the ground level, reset its position to the top
+        if (positions[i + 1] < -2.5) {
+            positions[i + 1] = Math.random() * 5 + 2; // Randomly reset to top range (Y-axis)
+            positions[i] = (Math.random() - 0.5) * parameteers.spread - 0.32; // Random X position
+            positions[i + 2] = (Math.random() - 0.5) * parameteers.spread - 4.5; // Random Z position
+        }
+    }
+
+    geometry.attributes.position.needsUpdate = true; // Inform Three.js to update the positions
+};
 
 
+const clock = new THREE.Clock();
+const tick = () => {
+    const elapsedTime = clock.getElapsedTime();
 
-//animate
-const clock = new THREE.Clock()
+    // Update controls
+    controls.update();
 
-const tick = ()=>{
-   const elpsedtime = clock.getElapsedTime()
+    // Update all snowflakes
+    scene.traverse((child) => {
+        if (child.isPoints) {
+            snowUpdate(child.geometry);
+        }
+    });
 
-   //update controls
-   controls.update()
+    // Render the scene
+    renderer.render(scene, camera);
 
-   //animate snowflake
-//    scene.traverse((child) => {
-//     if (child.isPoints) {
-//         child.position.y -= 0.002; // Slow fall speed
-//         if (child.position.y < -2) {
-//             child.position.y = 2; // Reset position when it goes below a certain level
-//         }
-//     }
-// });
-
-
-   //renderer
-   renderer.render(scene, camera)
-
-   //call tick function again on the next frame 
-   window.requestAnimationFrame(tick)
-
-}
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick);
+};
 tick();
