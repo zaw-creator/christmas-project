@@ -284,11 +284,11 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 
 
-const snowUpdate = (geometry) => {
+const snowUpdate = (geometry, deltatime) => {
     const positions = geometry.attributes.position.array;
 
     for (let i = 0; i < positions.length; i += 3) {
-        positions[i + 1] -= 0.001; // Move the Y-coordinate downwards (fall speed)
+        positions[i + 1] -= 0.001 * deltatime; // Move the Y-coordinate downwards (fall speed)
 
         // If the snowflake reaches below the ground level, reset its position to the top
         if (positions[i + 1] < -2.5) {
@@ -303,8 +303,14 @@ const snowUpdate = (geometry) => {
 
 
 const clock = new THREE.Clock();
+let time = Date.now()
 const tick = () => {
-    const elapsedTime = clock.getElapsedTime();
+    // const elapsedTime = clock.getElapsedTime();
+    const currentime = Date.now()
+    const deltatime = currentime - time
+    time = currentime
+    console.log(deltatime)
+    // console.log(elapsedTime)
 
     // Update controls
     controls.update();
@@ -312,7 +318,7 @@ const tick = () => {
     // Update all snowflakes
     scene.traverse((child) => {
         if (child.isPoints) {
-            snowUpdate(child.geometry);
+            snowUpdate(child.geometry,deltatime) ;
         }
     });
 
