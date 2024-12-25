@@ -36,8 +36,5 @@ This digital Christmas tree represents:
 - Install [Node.js](https://nodejs.org/) and a local server to run the project.
 - A modern web browser that supports WebGL.
 
-### Running the Project
-1. Clone this repository:
-   ```bash
-   git clone <repository-url>
-   cd <repository-folder>
+
+Thanks for reading hehe
