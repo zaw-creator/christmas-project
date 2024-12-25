@@ -222,9 +222,7 @@ guiTextDiv.style.fontFamily = 'Arial, sans-serif';
 guiTextDiv.style.fontSize = '14px';
 guiTextDiv.style.maxWidth = '400px';
 guiTextDiv.style.lineHeight ='20px  '
-guiTextDiv.style.zIndex = 1000; // Ensure it's on top of the canvas
-
-// Set your message
+guiTextDiv.style.zIndex = 1000; 
 guiTextDiv.innerHTML = `
     <h3>Message from me :D</h3>
     <p>Merry Christmas Everyone!</p>
@@ -232,13 +230,13 @@ guiTextDiv.innerHTML = `
     <p>Wishing you peace and happiness in the New Year!</p>
 `;
 
-// Add to the document
+
 document.body.appendChild(guiTextDiv);
 
 const snowflakes = [];
 
 
-// Snow Generation with Physics Bodies
+
 const generatesnow = (xOffset = 0, yOffset = 0, zOffset = 0) => {
     const snowgeometry = new THREE.BufferGeometry();
     const position = new Float32Array(parameteers.count * 3);
@@ -328,9 +326,9 @@ const snowUpdate = (geometry, deltatime) => {
     for (let i = 0; i < positions.length; i += 3) {
         positions[i + 1] -= 0.001 * deltatime; // Move the Y-coordinate downwards (fall speed)
 
-        // If the snowflake reaches below the ground level, reset its position to the top
+        
         if (positions[i + 1] < -2.5) {
-            positions[i + 1] = Math.random() * 5 + 2; // Randomly reset to top range (Y-axis)
+            positions[i + 1] = Math.random() * 5 + 2;
             positions[i] = (Math.random() - 0.5) * parameteers.spread - 0.32; // Random X position
             positions[i + 2] = (Math.random() - 0.5) * parameteers.spread - 4.5; // Random Z position
         }
@@ -360,10 +358,9 @@ const tick = () => {
         }
     });
 
-    // Render the scene
     renderer.render(scene, camera);
 
-    // Call tick again on the next frame
+    
     window.requestAnimationFrame(tick);
 };
 tick();
